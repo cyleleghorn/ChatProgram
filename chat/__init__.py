@@ -12,9 +12,8 @@ def setupTheProgramForKelly():
     print("Waiting for connection on port",str(port) + "...")
     clientsocket = sock.accept()
     print("Connection received!\n")
+    Thread(target=receive_serv).start()  
     serverLoop()
-    #Thread(target=send_msg, args=(clientsocket,)).start()  
-    #Thread(target=recv_msg, args=(sockfd,)).start()
     return;
 
 def setupTheProgramForCyle():
@@ -32,8 +31,8 @@ def setupTheProgramForCyle():
             print("Connection refused.")
     if connectionMade:
         print("Connection established!\n")
-        #clientLoop()
-        Thread(target=receive).start()  
+        Thread(target=receive).start()
+        clientLoop()  
         #Thread(target=recv_msg, args=(sockfd,)).start()
     else:
         print("\nFailed to establish connection to server.  Relaunching...\n")
@@ -57,7 +56,7 @@ def getTypeFromUser():
         getTypeFromUser()
     return;
 
-def clientLoop():
+def clientLoopOld():
     global sock
     while True: 
         try:
@@ -83,6 +82,14 @@ def serverLoop():
         clientsocket[0].sendall(zyx)
     return;
 
+def clientLoop():
+    global sock
+    while True:
+        xyz = input("Type the message to send: ")
+        zyx = xyz.encode('utf-8')
+        sock.sendall(zyx)
+    return;
+
 def printIntro():
     print("+---------------------------------------+")
     print("|    Welcome to Cyle's Chat Program!    |")
@@ -103,6 +110,15 @@ def receive():
     global sock
     while True:
         data = sock.recv(1024)
+        if not data: sys.exit(0)
+        abc = data.decode('utf-8')
+        print("Message received:",abc)
+    return;
+
+def receive_serv():
+    global clientsocket
+    while True:
+        data = clientsocket[0].recv(1024)
         if not data: sys.exit(0)
         abc = data.decode('utf-8')
         print("Message received:",abc)
